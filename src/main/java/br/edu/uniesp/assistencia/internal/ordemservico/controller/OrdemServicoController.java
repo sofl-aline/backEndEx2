@@ -19,9 +19,12 @@ public class OrdemServicoController {
 
     private final OrdemServicoService ordemServicoService;
 
-    @PostMapping("{/id}")
-    public ResponseEntity<CriarOrdemServicoResponse> abrir(@Valid @RequestBody CriarOrdemServicoRequest request) {
+    @PostMapping
+    public ResponseEntity<CriarOrdemServicoResponse> abrir(@Valid @RequestBody CriarOrdemServicoRequest request,
+                                                         UriComponentsBuilder uriBuilder) {
         CriarOrdemServicoResponse response = ordemServicoService.abrirOrdemServico(request);
+        java.net.URI location = uriBuilder.path("/ordens/{id}")
+                .buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 }
