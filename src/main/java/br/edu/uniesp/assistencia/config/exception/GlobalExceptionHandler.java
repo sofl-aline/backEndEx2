@@ -5,6 +5,7 @@ import br.edu.uniesp.assistencia.shared.exception.RegraNegocioException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -51,6 +52,15 @@ public class GlobalExceptionHandler {
                 erros.put(error.getField(), error.getDefaultMessage()));
 
         problema.setProperty("erros", erros);
+        return problema;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail tratarJsonInvalido(HttpMessageNotReadableException exception, HttpServletRequest request) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "O corpo da requisição deve conter um JSON válido com os tipos de dados esperados.");
+        problema.setTitle("Dados de requisição inválidos");
+        problema.setInstance(URI.create(request.getRequestURI()));
         return problema;
     }
 

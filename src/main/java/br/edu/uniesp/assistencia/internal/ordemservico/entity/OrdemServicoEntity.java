@@ -72,15 +72,23 @@ public class OrdemServicoEntity {
     private List<AnexoEntity> anexos = new ArrayList<>();
 
     public OrdemServicoEntity(String numeroProtocolo, ClienteEntity cliente, EquipamentoEntity equipamento, String descricaoProblema) {
+        this(numeroProtocolo, cliente, equipamento, descricaoProblema, LocalDateTime.now());
+    }
+
+    public OrdemServicoEntity(String numeroProtocolo, ClienteEntity cliente, EquipamentoEntity equipamento,
+                              String descricaoProblema, LocalDateTime dataAbertura) {
         if (!cliente.isAtivo()) {
             throw new RegraNegocioException("Não é permitido abrir Ordem de Serviço para um cliente inativo.");
+        }
+        if (!equipamento.getCliente().getId().equals(cliente.getId())) {
+            throw new RegraNegocioException("O equipamento informado não pertence ao cliente indicado.");
         }
         this.numeroProtocolo = numeroProtocolo;
         this.cliente = cliente;
         this.equipamento = equipamento;
         this.descricaoProblema = descricaoProblema;
         this.status = StatusOrdemServico.RECEBIDA;
-        this.dataAbertura = LocalDateTime.now();
+        this.dataAbertura = dataAbertura;
         adicionarHistorico(null, StatusOrdemServico.RECEBIDA, "SISTEMA", "Abertura da ordem de serviço.");
     }
 
